@@ -38,3 +38,6 @@ func set_building_rail(enabled : bool) -> void:
 
 func set_place_train(enabled : bool) -> void:
 	placing_train = enabled
+
+func is_performing_action() -> bool:
+	return building_rail || placing_train

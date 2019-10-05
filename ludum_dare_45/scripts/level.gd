@@ -1,5 +1,8 @@
 extends Node2D
 
+const STATION_SQUARE = 0
+const STATION_CIRCLE = 1
+
 const UP = 0
 const DOWN = 1
 const LEFT = 2
@@ -15,10 +18,26 @@ const QUAD_CONNECIONS = 6
 
 onready var map = $nav/map
 
+var station = preload("res://objects/station.tscn")
+var stations = {}
+
 func _ready() -> void:
 	for x in range(0, 100):
 		for y in range(0, 100):
 			map.set_cell(x ,y, 0)
+
+func create_station() -> void:
+	var new_station = station.instance()
+	new_station.position = Vector2(4*32, 4*32)
+	var type = "square"
+	stations[type] = new_station
+	$stations.add_child(new_station)
+
+func get_station_names() -> Array:
+	return stations.keys()
+
+func get_station(type : String) -> Vector2:
+	return stations[type]
 
 func place_tile(x : int, y : int) -> void:
 	map.set_cell(x ,y, NO_CONNECTIONS)
@@ -77,3 +96,6 @@ func _update_cell(x : int, y : int) -> void:
 			return
 		map.set_cell(x ,y, RIGHT_ANGLE_CONNECTION, connections[RIGHT], connections[DOWN], connections[RIGHT] || connections[LEFT])
 		return
+
+func map_to_world(x : int, y :int) -> Vector2:
+	return map.map_to_world(Vector2(x, y))
