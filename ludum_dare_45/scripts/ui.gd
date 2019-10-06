@@ -7,6 +7,7 @@ signal place_train_toggled
 signal place_signal_toggled
 
 var updating_buttons := false
+var clicked := false
 
 signal save_train
 
@@ -16,6 +17,8 @@ func _ready() -> void:
 	$place_signal.connect("toggled", self, "place_signal_toggled")
 	$train_controller.connect("save_train", self, "save_train")
 	$signal_editor.connect("edit_signal_zone", self, "edit_signal_zone")
+	$menu.connect("pressed", self, "_menu")
+	$exit.connect("pressed", self, "_exit")
 
 func _reset_buttons():
 	updating_buttons = true;
@@ -53,3 +56,19 @@ func edit_signal_zone(signal_to_edit, editing) -> void:
 
 func save_train(instructions : Array) -> void:
 	emit_signal("save_train", instructions)
+
+func _menu():
+	if (clicked):
+		return
+	clicked = true
+	$click.play()
+	yield($click, "finished")
+	Globals.set_scene("res://menus/main_menu.tscn")
+
+func _exit():
+	if (clicked):
+		return
+	clicked = true
+	$click.play()
+	yield($click, "finished")
+	get_tree().quit()

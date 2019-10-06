@@ -13,6 +13,7 @@ func _ready() -> void:
 	$player.connect("place_signal", self, "_place_signal")
 	$player.connect("sell_tile", $level, "sell_tile")
 	$player.connect("buy_train", self, "_buy_train")
+	$player.connect("can_place_signal_zone", self, "_can_place_signal_zone")
 
 	$ui.connect("build_rail_toggled", $player, "set_building_rail")
 	$ui.connect("place_train_toggled", $player, "set_place_train")
@@ -57,6 +58,9 @@ func _can_place_train(x : int, y : int) -> void:
 func _can_place_signal(x : int, y : int) -> void:
 	$player.can_place_signal = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
 
+func _can_place_signal_zone(x : int, y : int) -> void:
+	$player.can_place_signal_zone = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
+
 func _place_signal(x : int, y: int) -> void:
 	if (!$player.can_place_signal):
 		if (!$bad_place.playing):
@@ -91,6 +95,7 @@ func _buy_train(x : int, y : int) -> void:
 	new_train.connect("clicked", self, "_train_clicked")
 	new_train.connect("request_path", self, "_train_request_path")
 	new_train.connect("train_zone_check", self, "_train_zone_check")
+	new_train.connect("crash", self, "_crash")
 	$trains.add_child(new_train)
 	if (first_train):
 		$music.play()
@@ -128,3 +133,7 @@ func _train_request_path(train, station : String):
 
 	if (points.size() > 0):
 		train.set_path(points)
+
+func _crash():
+	if (!$crash.playing):
+		$crash.play()

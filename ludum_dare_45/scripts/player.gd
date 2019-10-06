@@ -9,6 +9,7 @@ signal buy_train
 signal can_place_track
 signal can_place_train
 signal can_place_signal
+signal can_place_signal_zone
 
 var signal_edit
 
@@ -20,6 +21,7 @@ var placing_signal_zone := false
 var can_place_track := false
 var can_place_train := false
 var can_place_signal := false
+var can_place_signal_zone := false
 
 func _input(event: InputEvent) -> void:
 	if (event is InputEventMouse):
@@ -33,6 +35,8 @@ func _input(event: InputEvent) -> void:
 				emit_signal("can_place_train", mouse_pos.x, mouse_pos.y)
 			if (placing_signal):
 				emit_signal("can_place_signal", mouse_pos.x, mouse_pos.y)
+			if (placing_signal_zone):
+				emit_signal("can_place_signal_zone", mouse_pos.x, mouse_pos.y)
 			$place_tile_icon.position = Vector2(mouse_pos.x * Globals.tile_width, mouse_pos.y * Globals.tile_height)
 
 		if (building_rail):
@@ -61,10 +65,14 @@ func _input(event: InputEvent) -> void:
 				var mouse_pos := get_local_mouse_position()
 				if (floor(mouse_pos.y / Globals.tile_height) > 28):
 					return
-				signal_edit.add_zone_check(floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
+				if (can_place_signal_zone):
+					signal_edit.add_zone_check(floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
 
 		if (event.button_mask == BUTTON_RIGHT):
 			var mouse_pos := get_local_mouse_position()
+			if (placing_signal_zone):
+				signal_edit.remove_zone_check(floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
+				return
 			emit_signal("sell_tile", floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
 
 func set_building_rail(enabled : bool) -> void:

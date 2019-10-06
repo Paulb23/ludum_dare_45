@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://fonts/Orbitron-Medium.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://menus/main_menu.gd" type="Script" id=2]
@@ -11,6 +11,8 @@
 [ext_resource path="res://objects/square_person.png" type="Texture" id=9]
 [ext_resource path="res://objects/triangle_person.png" type="Texture" id=10]
 [ext_resource path="res://fonts/Orbitron-Bold.ttf" type="DynamicFontData" id=11]
+[ext_resource path="res://sfx/music.ogg" type="AudioStream" id=12]
+[ext_resource path="res://sfx/click.wav" type="AudioStream" id=13]
 
 [sub_resource type="DynamicFont" id=1]
 size = 72
@@ -142,3 +144,14 @@ texture = ExtResource( 9 )
 [node name="square_person4" type="Sprite" parent="."]
 position = Vector2( 1796, 165 )
 texture = ExtResource( 9 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 12 )
+volume_db = -5.0
+autoplay = true
+bus = "music"
+
+[node name="click" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 13 )
+volume_db = -5.0
+bus = "sfx"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=2]
+[gd_scene load_steps=30 format=2]
 
 [ext_resource path="res://scripts/level.gd" type="Script" id=1]
 [ext_resource path="res://tiles/tileset.tres" type="TileSet" id=2]
@@ -17,10 +17,21 @@
 [ext_resource path="res://sfx/build_1.wav" type="AudioStream" id=15]
 [ext_resource path="res://sfx/build_2.wav" type="AudioStream" id=16]
 [ext_resource path="res://sfx/bad_place.wav" type="AudioStream" id=17]
-[ext_resource path="res://sfx/music.ogg" type="AudioStream" id=18]
+[ext_resource path="res://sfx/theme.ogg" type="AudioStream" id=18]
 [ext_resource path="res://sfx/spawn_2.wav" type="AudioStream" id=19]
 [ext_resource path="res://sfx/spawn.wav" type="AudioStream" id=20]
 [ext_resource path="res://scripts/signal_editor.gd" type="Script" id=21]
+[ext_resource path="res://icons/signal_icon_active.png" type="Texture" id=22]
+[ext_resource path="res://icons/signal_icon.png" type="Texture" id=23]
+[ext_resource path="res://icons/signal_icon_hover.png" type="Texture" id=24]
+[ext_resource path="res://menus/options.tscn" type="PackedScene" id=25]
+[ext_resource path="res://fonts/Orbitron-Medium.ttf" type="DynamicFontData" id=26]
+[ext_resource path="res://sfx/click.wav" type="AudioStream" id=27]
+[ext_resource path="res://sfx/crash.wav" type="AudioStream" id=28]
+
+[sub_resource type="DynamicFont" id=1]
+size = 24
+font_data = ExtResource( 26 )
 
 [node name="game" type="Node2D"]
 script = ExtResource( 4 )
@@ -103,9 +114,9 @@ margin_right = 989.0
 margin_bottom = 1063.0
 rect_min_size = Vector2( 64, 0 )
 toggle_mode = true
-texture_normal = ExtResource( 9 )
-texture_pressed = ExtResource( 11 )
-texture_hover = ExtResource( 10 )
+texture_normal = ExtResource( 23 )
+texture_pressed = ExtResource( 22 )
+texture_hover = ExtResource( 24 )
 expand = true
 __meta__ = {
 "_edit_use_anchors_": false
@@ -180,7 +191,10 @@ margin_bottom = 22.0
 [node name="Label" type="Label" parent="ui/signal_editor/HBoxContainer"]
 margin_right = 40.0
 margin_bottom = 14.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Train Direction"
+align = 1
+valign = 1
 
 [node name="train_diriection" type="OptionButton" parent="ui/signal_editor/HBoxContainer"]
 margin_right = 133.0
@@ -201,6 +215,39 @@ margin_bottom = 22.0
 size_flags_horizontal = 3
 text = "OK"
 
+[node name="menu" type="Button" parent="ui"]
+margin_left = 1533.0
+margin_top = 969.0
+margin_right = 1618.0
+margin_bottom = 999.0
+custom_fonts/font = SubResource( 1 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_hover = Color( 0.32549, 0.32549, 0.32549, 1 )
+text = "MENU"
+flat = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="exit" type="Button" parent="ui"]
+margin_left = 1533.0
+margin_top = 1026.0
+margin_right = 1618.0
+margin_bottom = 1056.0
+custom_fonts/font = SubResource( 1 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_hover = Color( 0.32549, 0.32549, 0.32549, 1 )
+text = "EXIT"
+flat = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="click" type="AudioStreamPlayer" parent="ui"]
+stream = ExtResource( 27 )
+volume_db = -5.0
+bus = "sfx"
+
 [node name="train_sfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 12 )
 volume_db = -5.0
@@ -220,7 +267,19 @@ stream = ExtResource( 17 )
 volume_db = -10.0
 bus = "sfx"
 
+[node name="crash" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 28 )
+volume_db = -5.0
+bus = "sfx"
+
 [node name="music" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 18 )
 volume_db = -5.0
 bus = "music"
+
+[node name="options" parent="." instance=ExtResource( 25 )]
+modulate = Color( 0, 0, 0, 1 )
+margin_left = 1670.0
+margin_top = 948.0
+margin_right = 1710.0
+margin_bottom = 988.0

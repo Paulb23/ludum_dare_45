@@ -1,15 +1,24 @@
 extends Control
 
+var clicked
+
 func _ready() -> void:
+	clicked = false
 	$exit.connect("pressed", self, "_exit")
 	$play.connect("pressed", self, "_play")
 
 func _play():
-	#$click.play()
-	#yield($click, "finished")
+	if (clicked):
+		return
+	clicked = true
+	$click.play()
+	yield($click, "finished")
 	Globals.set_scene("res://game.tscn")
 
 func _exit():
-	#$click.play()
-	#yield($click, "finished")
+	if (clicked):
+		return
+	clicked = true
+	$click.play()
+	yield($click, "finished")
 	get_tree().quit()

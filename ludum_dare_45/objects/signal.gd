@@ -23,6 +23,11 @@ func add_zone_check(x : int, y : int) -> void:
 		zoned_tiles.push_back(Vector2(x ,y))
 	$zones.set_cell(x, y, ZONE_CHECK)
 
+func remove_zone_check(x : int, y : int) -> void:
+	if (zoned_tiles.has(Vector2(x ,y))):
+		zoned_tiles.erase(Vector2(x ,y))
+	$zones.set_cell(x, y, -1)
+
 func get_zone() -> Array:
 	return zoned_tiles
 

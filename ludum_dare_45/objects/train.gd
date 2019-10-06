@@ -3,6 +3,7 @@ extends Node2D
 signal clicked
 signal request_path
 signal train_zone_check
+signal crash
 
 var train_in_path = false
 var base_speed = 100
@@ -12,6 +13,7 @@ var current_target : String
 var current_instruction = 0
 var instructions := []
 
+var dead = false
 var max_people = 6
 var current_people = 0
 var people  = []
@@ -56,7 +58,7 @@ func _update_path():
 	current_target = instructions[current_instruction]
 
 func _physics_process(delta: float) -> void:
-	if (train_in_path || instructions.size() == 0):
+	if (dead || train_in_path || instructions.size() == 0):
 		return
 
 	if (path.size() == 0):
@@ -154,7 +156,13 @@ func _area_entered(body):
 			emit_signal("train_zone_check", self, main_node.get_zone(), checks > 20)
 
 	if (main_node.get_name().find("train") != -1):
-		print("crash!")
+		emit_signal("crash")
+		dead = true
+		main_node.dead = true
+		$dead_timer.start()
+		yield($dead_timer, "timeout")
+		queue_free()
+		main_node.queue_free()
 
 
 func _clear_icons():
