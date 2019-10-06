@@ -1,6 +1,7 @@
 extends Node2D
 
 var train = preload("res://objects/train.tscn")
+var clicked_signal
 var clicked_train
 var first_train = true
 
@@ -8,13 +9,18 @@ func _ready() -> void:
 	$player.connect("place_tile", self, "_buy_track")
 	$player.connect("can_place_track", self, "_can_place_track")
 	$player.connect("can_place_train", self, "_can_place_train")
+	$player.connect("can_place_signal", self, "_can_place_signal")
+	$player.connect("place_signal", self, "_place_signal")
 	$player.connect("sell_tile", $level, "sell_tile")
 	$player.connect("buy_train", self, "_buy_train")
 
 	$ui.connect("build_rail_toggled", $player, "set_building_rail")
 	$ui.connect("place_train_toggled", $player, "set_place_train")
+	$ui.connect("place_signal_toggled", $player, "set_place_signal")
 	$ui.connect("save_train", self, "_save_train")
+	$ui.connect("edit_signal_zone", $player, "edit_signal_zone")
 
+	$level.connect("edit_signal", self, "_edit_signal")
 	$level.create_station()
 
 func _can_place_track(x : int, y : int) -> void:
@@ -48,6 +54,22 @@ func _can_place_track(x : int, y : int) -> void:
 func _can_place_train(x : int, y : int) -> void:
 	$player.can_place_train = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
 
+func _can_place_signal(x : int, y : int) -> void:
+	$player.can_place_signal = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
+
+func _place_signal(x : int, y: int) -> void:
+	if (!$player.can_place_signal):
+		if (!$bad_place.playing):
+			$bad_place.play()
+		return
+	$level.create_signal(x, y)
+
+func _edit_signal(signal_to_edit) -> void:
+	if ($player.is_performing_action()):
+		return
+	clicked_signal = signal_to_edit
+	$ui.edit_signal(signal_to_edit)
+
 func _buy_track(x : int, y: int) -> void:
 	if (!$player.can_place_track):
 			return
@@ -68,22 +90,41 @@ func _buy_train(x : int, y : int) -> void:
 	new_train.position = $level.map_to_world(x, y)
 	new_train.connect("clicked", self, "_train_clicked")
 	new_train.connect("request_path", self, "_train_request_path")
+	new_train.connect("train_zone_check", self, "_train_zone_check")
 	$trains.add_child(new_train)
 	if (first_train):
 		$music.play()
 		first_train = false
 
-func _train_clicked(train) -> void:
+func _train_zone_check(train, zone : Array, new_route : bool) -> void:
+	for other_trains in $trains.get_children():
+		if (other_trains == train):
+			continue
+		var train_pos = Vector2(other_trains.position.x / 32, other_trains.position.y / 32)
+		if (zone.has(train_pos)):
+			train.train_in_path = true
+			if (new_route):
+				$level._update_walkable_cells(zone);
+				var points = $level.find_path(train.position, $level.get_station(train.current_target).get_target_pos())
+
+				if (points.size() > 0):
+					train.set_path(points)
+					train.train_in_path = false
+			return
+	train.train_in_path = false
+
+func _train_clicked(train_clicked) -> void:
 	if ($player.is_performing_action()):
 		return
-	clicked_train = train
+	clicked_train = train_clicked
 	$ui.edit_train(clicked_train.instructions, $level.get_station_names())
 
 func _save_train(instructions : Array) -> void:
 	clicked_train.set_instructions(instructions)
 
 func _train_request_path(train, station : String):
-	var points = $level/nav.get_simple_path(train.position, $level.get_station(station).get_target_pos(), false)
-	if (points.size() > 0 && points[0] == train.position):
-		points.remove(0)
+	$level._update_walkable_cells([]);
+	var points = $level.find_path(train.position, $level.get_station(station).get_target_pos())
+
+	if (points.size() > 0):
 		train.set_path(points)

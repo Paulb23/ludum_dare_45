@@ -2,7 +2,9 @@ extends Node2D
 
 signal clicked
 signal request_path
+signal train_zone_check
 
+var train_in_path = false
 var base_speed = 100
 var speed = 100
 var max_speed = 150
@@ -54,7 +56,7 @@ func _update_path():
 	current_target = instructions[current_instruction]
 
 func _physics_process(delta: float) -> void:
-	if (instructions.size() == 0):
+	if (train_in_path || instructions.size() == 0):
 		return
 
 	if (path.size() == 0):
@@ -70,7 +72,7 @@ func _physics_process(delta: float) -> void:
 
 	# normalise target pos to grid
 	var target_tile = Vector2(floor(path[0].x / Globals.tile_width), floor(path[0].y / Globals.tile_height))
-	var target_pos = Vector2(target_tile.x * Globals.tile_width, target_tile. y * Globals.tile_height)
+	var target_pos = Vector2(target_tile.x * Globals.tile_width, target_tile. y * Globals.tile_height) + Vector2(16,16)
 
 	rotation = lerp(rotation, position.angle_to_point(target_pos), delta * 10)
 	var pos = Vector2(position.x, position.y);
@@ -120,6 +122,40 @@ func _area_entered(body):
 		current_people = people.size()
 
 		loading_people = false
+
+	if (main_node.get_name().find("signal") != -1):
+		if (path.size() <= 0):
+			return
+
+		var signal_tile = Vector2(floor(main_node.position.x / Globals.tile_width), floor(main_node.position.y / Globals.tile_height))
+		var target_tile = Vector2(floor(path[0].x / Globals.tile_width), floor(path[0].y / Globals.tile_height))
+		var direction = signal_tile - target_tile
+
+		if (direction.x > 0):
+			direction = main_node.LEFT
+		elif (direction.x < 0):
+			direction = main_node.RIGHT
+		elif (direction.y > 0):
+			direction = main_node.DOWN
+		elif (direction.y < 0):
+			direction = main_node.UP
+
+		# not a signal for us
+		if (main_node.train_direction_check != direction):
+			return
+
+		emit_signal("train_zone_check", self, main_node.get_zone(), false)
+		var checks := 0
+		while (train_in_path):
+			$train_check_timer.start()
+			yield($train_check_timer, "timeout")
+			checks += 1
+			# longer then 20, find a diffrent route.
+			emit_signal("train_zone_check", self, main_node.get_zone(), checks > 20)
+
+	if (main_node.get_name().find("train") != -1):
+		print("crash!")
+
 
 func _clear_icons():
 	for child in $people.get_children():

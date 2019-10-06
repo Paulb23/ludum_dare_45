@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://scripts/level.gd" type="Script" id=1]
 [ext_resource path="res://tiles/tileset.tres" type="TileSet" id=2]
@@ -20,6 +20,7 @@
 [ext_resource path="res://sfx/music.ogg" type="AudioStream" id=18]
 [ext_resource path="res://sfx/spawn_2.wav" type="AudioStream" id=19]
 [ext_resource path="res://sfx/spawn.wav" type="AudioStream" id=20]
+[ext_resource path="res://scripts/signal_editor.gd" type="Script" id=21]
 
 [node name="game" type="Node2D"]
 script = ExtResource( 4 )
@@ -38,6 +39,8 @@ compatibility_mode = true
 centered_textures = true
 format = 1
 
+[node name="signals" type="Node2D" parent="level"]
+
 [node name="stations" type="Node2D" parent="level"]
 z_index = 1
 
@@ -54,8 +57,10 @@ bus = "sfx"
 
 [node name="trains" type="Node2D" parent="."]
 
+[node name="Line2D" type="Line2D" parent="."]
+points = PoolVector2Array( 853, 523 )
+
 [node name="ui" type="Control" parent="."]
-margin_right = 1920.0
 script = ExtResource( 8 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -80,6 +85,21 @@ __meta__ = {
 margin_left = 707.0
 margin_top = 935.0
 margin_right = 835.0
+margin_bottom = 1063.0
+rect_min_size = Vector2( 64, 0 )
+toggle_mode = true
+texture_normal = ExtResource( 9 )
+texture_pressed = ExtResource( 11 )
+texture_hover = ExtResource( 10 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="place_signal" type="TextureButton" parent="ui"]
+margin_left = 861.0
+margin_top = 935.0
+margin_right = 989.0
 margin_bottom = 1063.0
 rect_min_size = Vector2( 64, 0 )
 toggle_mode = true
@@ -139,6 +159,47 @@ margin_right = 200.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "cancel"
+
+[node name="signal_editor" type="VBoxContainer" parent="ui"]
+visible = false
+margin_left = 4.0
+margin_top = 184.0
+margin_right = 204.0
+margin_bottom = 584.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 21 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="VBoxContainer" parent="ui/signal_editor"]
+margin_right = 258.0
+margin_bottom = 22.0
+
+[node name="Label" type="Label" parent="ui/signal_editor/HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 14.0
+text = "Train Direction"
+
+[node name="train_diriection" type="OptionButton" parent="ui/signal_editor/HBoxContainer"]
+margin_right = 133.0
+margin_bottom = 22.0
+text = "Train Direction"
+
+[node name="edit_zone" type="Button" parent="ui/signal_editor/HBoxContainer"]
+margin_left = 137.0
+margin_right = 149.0
+margin_bottom = 22.0
+toggle_mode = true
+text = "Edit Zone"
+
+[node name="ok" type="Button" parent="ui/signal_editor/HBoxContainer"]
+margin_left = 153.0
+margin_right = 201.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+text = "OK"
 
 [node name="train_sfx" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 12 )

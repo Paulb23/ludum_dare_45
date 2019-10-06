@@ -72,6 +72,8 @@ autostart = true
 [node name="load_timer" type="Timer" parent="."]
 wait_time = 0.5
 
+[node name="train_check_timer" type="Timer" parent="."]
+
 [node name="Control" type="Button" parent="."]
 modulate = Color( 1, 1, 1, 0 )
 self_modulate = Color( 1, 1, 1, 0 )

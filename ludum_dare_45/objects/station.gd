@@ -60,8 +60,8 @@ func _add_person(person_type : String):
 	icon.visible = true
 	$people.add_child(icon)
 
-func unload_people(people : Array):
-	for person in people:
+func unload_people(unloaded_people : Array):
+	for person in unloaded_people:
 		if (!$unload.playing):
 			$unload.play()
 
