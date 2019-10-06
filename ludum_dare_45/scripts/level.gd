@@ -15,9 +15,12 @@ const THREE_CONNECTIONS = 3
 const STRAIGHT_CONNECION = 4
 const RIGHT_ANGLE_CONNECTION = 5
 const QUAD_CONNECIONS = 6
+const STATION_TILE = 7
 
 onready var map = $nav/map
 
+var max_people = 10
+var current_people = 0
 var station = preload("res://objects/station.tscn")
 var stations = {}
 
@@ -27,17 +30,45 @@ func _ready() -> void:
 			map.set_cell(x ,y, 0)
 
 func create_station() -> void:
+	_create_station("square", 12*32, 12*32)
+	_create_station("circle", 42*32, 12*32)
+	_create_station("triangle", 34*32, 24*32)
+
+func _create_station(type : String, x : int, y : int) -> void:
 	var new_station = station.instance()
-	new_station.position = Vector2(4*32, 4*32)
-	var type = "square"
+	new_station.position = Vector2(x, y)
+	new_station.connect("request_person", self, "_request_person")
+	new_station.connect("person_created", self, "_person_created")
+	new_station.connect("person_removed", self, "_person_removed")
 	stations[type] = new_station
 	$stations.add_child(new_station)
+	new_station.set_type(type)
+	var start_tile_x = x / Globals.tile_width
+	var start_tile_y = y / Globals.tile_height
+	for i in range(start_tile_x, start_tile_x + 4):
+		for j in range(start_tile_y, start_tile_y + 3):
+			place_tile(i, j)
 
 func get_station_names() -> Array:
 	return stations.keys()
 
 func get_station(type : String) -> Vector2:
 	return stations[type]
+
+func _request_person(station):
+	if current_people < max_people:
+		station.can_generate = true;
+		if (!$spawn_1.playing && !$spawn_2.playing):
+			if (rand_range(0, 1) > 0.5):
+				$spawn_1.play()
+			else:
+				$spawn_2.play()
+
+func _person_created():
+	current_people += 1
+
+func _person_removed():
+	current_people -= 1
 
 func place_tile(x : int, y : int) -> void:
 	map.set_cell(x ,y, NO_CONNECTIONS)
@@ -46,6 +77,9 @@ func place_tile(x : int, y : int) -> void:
 	_update_cell(x + 1, y)
 	_update_cell(x , y - 1)
 	_update_cell(x , y + 1)
+
+func get_tile(x : int, y : int) -> int:
+	return map.get_cell(x ,y)
 
 func sell_tile(x : int, y : int) -> void:
 	map.set_cell(x ,y, EMPTY)

@@ -23,10 +23,8 @@ func _option_selected(idx : int):
 
 func _apply_clicked() -> void:
 	var instructions := []
-	for i in $instructions.items.size():
-		if ($instructions.get_item_text(i) != ""):
-			instructions.push_back($instructions.get_item_text(i))
-	print(instructions)
+	for i in range(0, $instructions.get_item_count()):
+		instructions.push_back($instructions.get_item_text(i))
 	emit_signal("save_train", instructions)
 	visible = false
 
