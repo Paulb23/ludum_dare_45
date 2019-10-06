@@ -3,10 +3,15 @@ extends Node2D
 signal request_person
 signal person_created
 signal person_removed
+signal too_angry
+
+var min_wait_time = 5
+var max_wait_time = 10
 
 var can_generate = false;
 var max_people = 5
 var current_people = 0
+var anger := 0.0
 
 var people_types = [SQUARE, CIRCLE, TIRANGLE]
 var people = []
@@ -37,8 +42,16 @@ func get_type() -> String:
 func get_target_pos() -> Vector2:
 	return Vector2(position.x + 62, position.y + 50)
 
+func _update_anger_bar():
+	if (anger >= 1.0):
+		emit_signal("too_angry")
+	anger += 0.05
+	$anger_bar.set_percentage(anger)
+
+
 func _generate_person():
 	if (current_people >= max_people):
+		_update_anger_bar()
 		can_generate = false
 		return
 	emit_signal("request_person", self)
@@ -125,7 +138,7 @@ func remove_people(visiting_stations : Array, amount : int) -> Array:
 	return people_to_remove
 
 func _start_person_request_timer():
-	$new_person_timer.wait_time = rand_range(1, 5)
+	$new_person_timer.wait_time = rand_range(min_wait_time, max_wait_time)
 	$new_person_timer.start()
 
 

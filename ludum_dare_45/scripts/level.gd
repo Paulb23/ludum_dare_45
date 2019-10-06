@@ -1,6 +1,8 @@
 extends Node2D
 
 signal edit_signal
+signal person_removed
+signal game_over
 
 const STATION_SQUARE = 0
 const STATION_CIRCLE = 1
@@ -21,10 +23,18 @@ const STATION_TILE = 7
 
 onready var map = $nav/map
 
-var max_people = 10
+var max_people = 20
 var current_people = 0
+
+var station_min_x = 1
+var station_min_y = 1
+var station_max_x = 55
+var station_max_y = 25
+
 var station = preload("res://objects/station.tscn")
+var station_types = ["square", "circle", "triangle"]
 var stations = {}
+var inc = 0
 
 var signals = []
 var signal_scene = preload("res://objects/signal.tscn")
@@ -33,6 +43,24 @@ func _ready() -> void:
 	for x in range(0, 100):
 		for y in range(0, 100):
 			map.set_cell(x ,y, 0)
+	$inc_diff_timer.connect("timeout", self, "_inc_diff")
+	$inc_diff_timer.start()
+
+func _inc_diff():
+	inc += 1
+	for placed_station in stations.values():
+		placed_station.min_wait_time -= 0.2
+		if (placed_station.min_wait_time < 1):
+			placed_station.min_wait_time = 1
+
+		placed_station.max_wait_time -= 0.2
+		if (placed_station.max_wait_time < 3):
+			placed_station.max_wait_time = 3
+
+	max_people += 2;
+
+	if ((inc % 5) == 0):
+		create_station()
 
 func create_signal(x : int, y : int) -> void:
 	signals.push_back(Vector2(x,y))
@@ -55,23 +83,49 @@ func signal_clicked(clicked_signal) -> void:
 	emit_signal("edit_signal", clicked_signal)
 
 func create_station() -> void:
-	_create_station("square", 12*32, 12*32)
-	_create_station("circle", 42*32, 12*32)
-	_create_station("triangle", 34*32, 24*32)
+	if (station_types.size() <= 0):
+		return
+	var station_type = station_types[int(rand_range(0, station_types.size()))]
+
+	var pos_found = false
+	var attempts = 0
+	var x = 1
+	var y = 1
+	while !pos_found:
+		pos_found = true
+		x = int(rand_range(station_min_x, station_max_x))
+		y = int(rand_range(station_min_y, station_max_y))
+		for i in range(x, x + 4):
+			for j in range(y, y + 3):
+				if (map.get_cell(i, j) != EMPTY):
+					pos_found = false
+					break
+		if (pos_found):
+			for placed_station in stations.values():
+				var dist = Vector2(x ,y) - (placed_station.position / 32)
+				if (abs(dist.x) < 5 || abs(dist.y) < 5):
+					pos_found = false
+					break
+		if (attempts > 50):
+			break
+		attempts += 1;
+
+	if (pos_found):
+		_create_station(station_type, x, y)
+		station_types.erase(station_type)
 
 func _create_station(type : String, x : int, y : int) -> void:
 	var new_station = station.instance()
-	new_station.position = Vector2(x, y)
+	new_station.position = Vector2(x * 32, y * 32)
 	new_station.connect("request_person", self, "_request_person")
 	new_station.connect("person_created", self, "_person_created")
 	new_station.connect("person_removed", self, "_person_removed")
+	new_station.connect("too_angry", self, "_game_over")
 	stations[type] = new_station
 	$stations.add_child(new_station)
 	new_station.set_type(type)
-	var start_tile_x = floor(x / Globals.tile_width)
-	var start_tile_y = floor(y / Globals.tile_height)
-	for i in range(start_tile_x, start_tile_x + 4):
-		for j in range(start_tile_y, start_tile_y + 3):
+	for i in range(x, x + 4):
+		for j in range(y, y + 3):
 			map.set_cell(i , j, STATION_TILE)
 
 func get_station_names() -> Array:
@@ -93,7 +147,11 @@ func _person_created():
 	current_people += 1
 
 func _person_removed():
+	emit_signal("person_removed")
 	current_people -= 1
+
+func _game_over():
+	emit_signal("game_over")
 
 func place_tile(x : int, y : int) -> void:
 	map.set_cell(x ,y, NO_CONNECTIONS)

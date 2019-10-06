@@ -5,6 +5,8 @@ var clicked_signal
 var clicked_train
 var first_train = true
 
+var moved_passengers = 0
+
 func _ready() -> void:
 	$player.connect("place_tile", self, "_buy_track")
 	$player.connect("can_place_track", self, "_can_place_track")
@@ -23,7 +25,18 @@ func _ready() -> void:
 	$ui.connect("edit_signal_zone", $player, "edit_signal_zone")
 
 	$level.connect("edit_signal", self, "_edit_signal")
+	$level.connect("game_over", self, "_game_over")
+	$level.connect("person_removed", self, "_person_removed")
 	$level.create_station()
+	$level.create_station()
+
+
+
+func _person_removed():
+	moved_passengers += 1
+
+func _game_over():
+	$ui.game_over(moved_passengers)
 
 func _can_place_track(x : int, y : int) -> void:
 	if ($level.get_tile(x, y) != $level.EMPTY):

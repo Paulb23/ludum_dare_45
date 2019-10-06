@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://objects/square_station.png" type="Texture" id=1]
 [ext_resource path="res://objects/station.gd" type="Script" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://objects/triangle_person.png" type="Texture" id=7]
 [ext_resource path="res://sfx/load.wav" type="AudioStream" id=8]
 [ext_resource path="res://sfx/unload.wav" type="AudioStream" id=9]
+[ext_resource path="res://objects/anger_bar.gd" type="Script" id=10]
 
 [sub_resource type="RectangleShape2D" id=2]
 extents = Vector2( 32, 32 )
@@ -100,3 +101,6 @@ bus = "sfx"
 
 [node name="load_timer" type="Timer" parent="."]
 wait_time = 0.2
+
+[node name="anger_bar" type="Node2D" parent="."]
+script = ExtResource( 10 )

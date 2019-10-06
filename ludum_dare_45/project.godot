@@ -15,7 +15,7 @@ _global_script_class_icons={
 
 [application]
 
-config/name="Ludum Dare 45"
+config/name="Train Transporters"
 run/main_scene="res://menus/main_menu.tscn"
 config/icon="res://icon.png"
 

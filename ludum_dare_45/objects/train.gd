@@ -158,7 +158,9 @@ func _area_entered(body):
 				break
 			emit_signal("train_zone_check", self, main_node.get_zone(), checks > 20)
 
-	if (main_node != null && main_node.get_name().find("train") != -1):
+	if (main_node.get_name().find("train") != -1):
+		if (main_node.loading_people || loading_people):
+			return
 		emit_signal("crash")
 		dead = true
 		main_node.dead = true
