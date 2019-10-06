@@ -18,12 +18,39 @@ func _ready() -> void:
 	$level.create_station()
 
 func _can_place_track(x : int, y : int) -> void:
-	$player.can_place_track = ($level.get_tile(x ,y) == $level.EMPTY);
+	if ($level.get_tile(x, y) != $level.EMPTY):
+		$player.can_place_track = false
+		return
+
+	# check for circles
+	var top_left = [$level.get_tile(x - 1, y) , $level.get_tile(x - 1, y - 1), $level.get_tile(x, y - 1)]
+	if (top_left.count($level.EMPTY) + top_left.count($level.STATION_TILE) < 1):
+		$player.can_place_track = false
+		return
+
+	var top_right = [$level.get_tile(x + 1, y) , $level.get_tile(x + 1, y - 1), $level.get_tile(x, y - 1)]
+	if (top_right.count($level.EMPTY) + top_right.count($level.STATION_TILE) < 1):
+		$player.can_place_track = false
+		return
+
+	var bottom_left = [$level.get_tile(x - 1, y) , $level.get_tile(x - 1, y + 1), $level.get_tile(x, y + 1)]
+	if (bottom_left.count($level.EMPTY) + bottom_left.count($level.STATION_TILE) < 1):
+		$player.can_place_track = false
+		return
+
+	var bottom_right = [$level.get_tile(x + 1, y) , $level.get_tile(x + 1, y + 1), $level.get_tile(x, y + 1)]
+	if (bottom_right.count($level.EMPTY) + bottom_right.count($level.STATION_TILE) < 1):
+		$player.can_place_track = false
+		return
+
+	$player.can_place_track = true
 
 func _can_place_train(x : int, y : int) -> void:
 	$player.can_place_train = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
 
 func _buy_track(x : int, y: int) -> void:
+	if (!$player.can_place_track):
+			return
 	if (!$build_1.playing && !$build_2.playing):
 		if (rand_range(0, 1) > 0.5):
 			$build_1.play()

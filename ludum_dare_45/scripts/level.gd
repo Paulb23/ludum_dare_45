@@ -47,7 +47,7 @@ func _create_station(type : String, x : int, y : int) -> void:
 	var start_tile_y = y / Globals.tile_height
 	for i in range(start_tile_x, start_tile_x + 4):
 		for j in range(start_tile_y, start_tile_y + 3):
-			place_tile(i, j)
+			map.set_cell(i , j, STATION_TILE)
 
 func get_station_names() -> Array:
 	return stations.keys()
@@ -89,7 +89,7 @@ func sell_tile(x : int, y : int) -> void:
 	_update_cell(x , y + 1)
 
 func _update_cell(x : int, y : int) -> void:
-	if (map.get_cell(x, y) <= 0 || x < 0 || y < 0):
+	if (map.get_cell(x, y) <= 0 || map.get_cell(x, y) == STATION_TILE || x < 0 || y < 0):
 		return
 
 	var connections := [0, 0, 0, 0]

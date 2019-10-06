@@ -6,11 +6,15 @@ func _ready() -> void:
 	$HBoxContainer/apply.connect("button_up", self, "_apply_clicked")
 	$HBoxContainer/cancel.connect("button_up", self, "_cancel_clicked")
 	$options.get_popup().connect("id_pressed", self, "_option_selected")
+	$instructions.connect("button_pressed", self, "_delete_item")
 
 func edit(instructions : Array, stations : Array) -> void:
 	$instructions.clear()
+	var root = $instructions.create_item();
 	for intruction in instructions:
-		$instructions.add_item(intruction);
+		var item = $instructions.create_item();
+		item.set_text(0, intruction)
+		item.add_button(0, load("res://icons/delete_icon.png"))
 
 	$options.get_popup().clear()
 	for station in stations:
@@ -18,13 +22,22 @@ func edit(instructions : Array, stations : Array) -> void:
 	visible = true
 	pass
 
+func _delete_item(item: TreeItem, column: int, id: int) -> void:
+	$instructions.get_root().remove_child(item)
+
+
 func _option_selected(idx : int):
-	$instructions.add_item($options.get_popup().get_item_text(idx))
+	var item = $instructions.create_item();
+	item.set_text(0, $options.get_popup().get_item_text(idx))
+	item.add_button(0, load("res://icons/delete_icon.png"))
 
 func _apply_clicked() -> void:
 	var instructions := []
-	for i in range(0, $instructions.get_item_count()):
-		instructions.push_back($instructions.get_item_text(i))
+
+	var child = $instructions.get_root().get_children()
+	while child != null:
+		instructions.push_back(child.get_text(0))
+		child = child.get_next()
 	emit_signal("save_train", instructions)
 	visible = false
 

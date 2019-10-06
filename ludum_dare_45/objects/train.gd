@@ -17,7 +17,7 @@ var loading_people = false
 var path : PoolVector2Array
 
 func _ready() -> void:
-	$Area2D.connect("input_event", self, "_clicked")
+	$Control.connect("button_up", self, "_clicked")
 	$Area2D.connect("area_entered", self, "_area_entered")
 	$Area2D.connect("area_exited", self, "_area_exited")
 	$speed_up.connect("timeout", self, "_speed_up")
@@ -27,9 +27,8 @@ func _speed_up() -> void:
 		return
 	speed += 5
 
-func _clicked(viewport : Viewport, event: InputEvent, shape_idx : int) -> void:
-	if (event.is_action_released("place")):
-		emit_signal("clicked", self)
+func _clicked() -> void:
+	emit_signal("clicked", self)
 
 func set_instructions(new_instructions : Array):
 	instructions = new_instructions
