@@ -14,6 +14,7 @@ func _ready() -> void:
 	$player.connect("sell_tile", $level, "sell_tile")
 	$player.connect("buy_train", self, "_buy_train")
 	$player.connect("can_place_signal_zone", self, "_can_place_signal_zone")
+	$player.connect("sell_signal", self, "_sell_signal")
 
 	$ui.connect("build_rail_toggled", $player, "set_building_rail")
 	$ui.connect("place_train_toggled", $player, "set_place_train")
@@ -57,6 +58,9 @@ func _can_place_train(x : int, y : int) -> void:
 
 func _can_place_signal(x : int, y : int) -> void:
 	$player.can_place_signal = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
+	if (!$player.can_place_signal):
+		return
+	$player.can_place_signal = !$level.has_signal(x, y)
 
 func _can_place_signal_zone(x : int, y : int) -> void:
 	$player.can_place_signal_zone = ($level.get_tile(x ,y) != $level.EMPTY && $level.get_tile(x ,y) != $level.STATION_TILE);
@@ -73,6 +77,11 @@ func _edit_signal(signal_to_edit) -> void:
 		return
 	clicked_signal = signal_to_edit
 	$ui.edit_signal(signal_to_edit)
+
+func _sell_signal(x : int, y: int) -> void:
+	if (!$level.has_signal(x, y)):
+		return
+	$level.remove_signal(x, y)
 
 func _buy_track(x : int, y: int) -> void:
 	if (!$player.can_place_track):
@@ -105,7 +114,7 @@ func _train_zone_check(train, zone : Array, new_route : bool) -> void:
 	for other_trains in $trains.get_children():
 		if (other_trains == train):
 			continue
-		var train_pos = Vector2(other_trains.position.x / 32, other_trains.position.y / 32)
+		var train_pos = $level/nav/map.world_to_map(other_trains.position)
 		if (zone.has(train_pos)):
 			train.train_in_path = true
 			if (new_route):

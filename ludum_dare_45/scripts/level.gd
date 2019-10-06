@@ -26,6 +26,7 @@ var current_people = 0
 var station = preload("res://objects/station.tscn")
 var stations = {}
 
+var signals = []
 var signal_scene = preload("res://objects/signal.tscn")
 
 func _ready() -> void:
@@ -34,10 +35,21 @@ func _ready() -> void:
 			map.set_cell(x ,y, 0)
 
 func create_signal(x : int, y : int) -> void:
+	signals.push_back(Vector2(x,y))
 	var new_signal = signal_scene.instance()
 	new_signal.position = Vector2(x * 32, y * 32)
 	new_signal.connect("clicked", self, "signal_clicked")
 	$signals.add_child(new_signal)
+
+func remove_signal(x : int, y : int) -> void:
+	var vec = Vector2(x, y)
+	for placed_signal in $signals.get_children():
+		if (placed_signal.position / 32 == vec):
+			placed_signal.queue_free()
+	signals.erase(vec)
+
+func has_signal(x : int, y : int) -> bool:
+	return signals.has(Vector2(x,y))
 
 func signal_clicked(clicked_signal) -> void:
 	emit_signal("edit_signal", clicked_signal)

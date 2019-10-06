@@ -153,9 +153,12 @@ func _area_entered(body):
 			yield($train_check_timer, "timeout")
 			checks += 1
 			# longer then 20, find a diffrent route.
+			if (main_node == null):
+				train_in_path = false
+				break
 			emit_signal("train_zone_check", self, main_node.get_zone(), checks > 20)
 
-	if (main_node.get_name().find("train") != -1):
+	if (main_node != null && main_node.get_name().find("train") != -1):
 		emit_signal("crash")
 		dead = true
 		main_node.dead = true

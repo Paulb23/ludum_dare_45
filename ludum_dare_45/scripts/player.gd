@@ -10,6 +10,7 @@ signal can_place_track
 signal can_place_train
 signal can_place_signal
 signal can_place_signal_zone
+signal sell_signal
 
 var signal_edit
 
@@ -72,6 +73,9 @@ func _input(event: InputEvent) -> void:
 			var mouse_pos := get_local_mouse_position()
 			if (placing_signal_zone):
 				signal_edit.remove_zone_check(floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
+				return
+			if (placing_signal):
+				emit_signal("sell_signal", floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
 				return
 			emit_signal("sell_tile", floor(mouse_pos.x / Globals.tile_width), floor(mouse_pos.y / Globals.tile_height))
 

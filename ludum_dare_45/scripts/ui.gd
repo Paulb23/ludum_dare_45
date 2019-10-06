@@ -28,18 +28,27 @@ func _reset_buttons():
 	updating_buttons = false;
 
 func build_rail_toggled(toggled : bool) -> void:
+	if ($signal_editor.visible || $train_controller.visible):
+		_reset_buttons()
+		return
 	emit_signal("build_rail_toggled", toggled)
 	if (toggled):
 		$place_train.set_pressed(false)
 		$place_signal.set_pressed(false)
 
 func place_train_toggled(toggled : bool) -> void:
+	if ($signal_editor.visible || $train_controller.visible):
+		_reset_buttons()
+		return
 	emit_signal("place_train_toggled", toggled)
 	if (toggled):
 		$build_rail.set_pressed(false)
 		$place_signal.set_pressed(false)
 
 func place_signal_toggled(toggled : bool) -> void:
+	if ($signal_editor.visible || $train_controller.visible):
+		_reset_buttons()
+		return
 	emit_signal("place_signal_toggled", toggled)
 	if (toggled):
 		$build_rail.set_pressed(false)
