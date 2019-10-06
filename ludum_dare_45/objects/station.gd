@@ -116,9 +116,11 @@ func remove_people(visiting_stations : Array, amount : int) -> Array:
 		people.remove(people.find(person_type))
 		$people.get_index()
 		var node = $people.find_node("@"+person_type + "_*", false, false)
-		node.visible = false
-		node.free()
-		current_people -= 1
+		if node != null:
+			node = $people.find_node("@"+person_type + "_*", false, false)
+			node.visible = false
+			node.free()
+			current_people -= 1
 
 	return people_to_remove
 
